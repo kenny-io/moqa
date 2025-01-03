@@ -1,0 +1,38 @@
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+const PUBLIC_PATHS = ["/", "/auth/sign-in", "/auth/sign-up"];
+const WEBHOOK_PATH = /^\/api\/webhook\/.+/;
+
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next();
+  const supabase = createMiddlewareClient({ req, res });
+
+  // Allow webhook endpoints to be accessed without authentication
+  if (WEBHOOK_PATH.test(req.nextUrl.pathname)) {
+    return res;
+  }
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const isPublicPath = PUBLIC_PATHS.includes(req.nextUrl.pathname);
+
+  // Redirect authenticated users away from auth pages
+  if (session && isPublicPath) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  // Redirect unauthenticated users to sign-in page
+  if (!session && !isPublicPath) {
+    return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+  }
+
+  return res;
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};
