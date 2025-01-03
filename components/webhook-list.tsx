@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { WebhookEndpoint } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { WebhookIcon, Trash2Icon } from 'lucide-react';
+import { WebhookIcon, Trash2Icon, Copy } from 'lucide-react';
 import { DeleteWebhookDialog } from '@/components/delete-webhook-dialog';
+import { getBaseUrl } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface WebhookListProps {
   endpoints: WebhookEndpoint[];
@@ -20,11 +22,12 @@ export function WebhookList({
   onSelect,
   onDelete,
 }: WebhookListProps) {
-  const [webhookToDelete, setWebhookToDelete] = useState<WebhookEndpoint | null>(null);
+  const [deleteWebhook, setDeleteWebhook] = useState<WebhookEndpoint | null>(null);
 
-  const handleDeleteClick = (e: React.MouseEvent, endpoint: WebhookEndpoint) => {
-    e.stopPropagation();
-    setWebhookToDelete(endpoint);
+  const handleCopy = (webhook: WebhookEndpoint) => {
+    const fullUrl = `${getBaseUrl()}/api/webhook/${webhook.id}`;
+    navigator.clipboard.writeText(fullUrl);
+    toast.success('Webhook URL copied to clipboard');
   };
 
   return (
@@ -32,57 +35,56 @@ export function WebhookList({
       {endpoints.map((endpoint) => (
         <div
           key={endpoint.id}
-          className={cn(
-            "flex items-center space-x-2 p-3 rounded-md cursor-pointer transition-all",
+          className={`p-4 rounded-lg cursor-pointer group relative ${
             selectedEndpoint?.id === endpoint.id
-              ? "bg-primary/10 hover:bg-primary/20 border-l-2 border-l-primary shadow-sm"
-              : "hover:bg-accent group"
-          )}
+              ? 'bg-primary/10 hover:bg-primary/15'
+              : 'hover:bg-white/5'
+          }`}
           onClick={() => onSelect(endpoint)}
         >
-          <WebhookIcon className={cn(
-            "h-4 w-4 shrink-0",
-            selectedEndpoint?.id === endpoint.id && "text-primary"
-          )} />
-          <div className="flex-1 min-w-0">
-            <div className={cn(
-              "font-medium truncate",
-              selectedEndpoint?.id === endpoint.id && "text-primary"
-            )}>{endpoint.name}</div>
-            <div className="text-sm text-muted-foreground truncate">{endpoint.url}</div>
+          <h3 className="font-medium mb-1">{endpoint.name}</h3>
+          <p className="text-sm text-white/60 break-all">
+            {`${getBaseUrl()}/api/webhook/${endpoint.id}`}
+          </p>
+          
+          <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCopy(endpoint);
+              }}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              title="Copy webhook URL"
+            >
+              <Copy className="h-4 w-4 text-white/70" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDeleteWebhook(endpoint);
+              }}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              title="Delete webhook"
+            >
+              <Trash2Icon className="h-4 w-4 text-white/70" />
+            </button>
           </div>
-          {endpoint.is_private && (
-            <div className="text-xs bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded-full border border-yellow-500/20 shrink-0">
-              Private
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "opacity-0 group-hover:opacity-100 transition-opacity",
-              selectedEndpoint?.id === endpoint.id && "opacity-100"
-            )}
-            onClick={(e) => handleDeleteClick(e, endpoint)}
-          >
-            <Trash2Icon className="h-4 w-4 text-destructive" />
-          </Button>
         </div>
       ))}
 
-      {endpoints.length === 0 && (
-        <div className="text-center p-4 text-muted-foreground">
-          No webhooks created yet
-        </div>
-      )}
-
-      {webhookToDelete && (
+      {deleteWebhook && (
         <DeleteWebhookDialog
-          webhook={webhookToDelete}
-          open={!!webhookToDelete}
-          onOpenChange={(open) => !open && setWebhookToDelete(null)}
+          webhook={deleteWebhook}
+          open={!!deleteWebhook}
+          onOpenChange={(open) => !open && setDeleteWebhook(null)}
           onDeleted={onDelete}
         />
+      )}
+
+      {endpoints.length === 0 && (
+        <div className="text-center py-8 text-white/50">
+          No webhooks created yet
+        </div>
       )}
     </div>
   );

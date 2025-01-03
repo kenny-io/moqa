@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { getSiteURL } from '@/lib/utils';
+import { getBaseUrl } from '@/lib/utils';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -29,7 +29,7 @@ export default function SignUpPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${getSiteURL()}/auth/callback`,
+          emailRedirectTo: `${getBaseUrl()}/auth/callback`,
         },
       });
 
@@ -54,7 +54,7 @@ export default function SignUpPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${getSiteURL()}/auth/callback`,
+          redirectTo: `${getBaseUrl()}/auth/callback`,
         },
       });
 
