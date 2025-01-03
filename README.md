@@ -1,6 +1,6 @@
-# Webhook Mock
+# Moqa
 
-A powerful webhook testing and debugging service built with Next.js and Supabase.
+A powerful webhook creation, testing and debugging service built with Next.js and Supabase.
 
 ![Webhook Mock Screenshot](https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&q=80&w=1200&h=600)
 
@@ -34,8 +34,8 @@ A powerful webhook testing and debugging service built with Next.js and Supabase
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/webhook-mock.git
-   cd webhook-mock
+   git clone https://github.com/kenny-io/moqa.git
+   cd moqa
    ```
 
 2. Install dependencies:
@@ -57,6 +57,7 @@ A powerful webhook testing and debugging service built with Next.js and Supabase
    - Go to SQL Editor
    - Copy the contents of `supabase/migrations/20250102194523_divine_wind.sql`
    - Run the SQL script
+   - Handle RLS policies as you see fit
 
 ### Step 3: Environment Setup
 
@@ -113,5 +114,3 @@ A powerful webhook testing and debugging service built with Next.js and Supabase
    - Verify Supabase Realtime is enabled
    - Check browser console for WebSocket errors
    - Ensure you're authenticated
-
-[Rest of the README remains the same...]
