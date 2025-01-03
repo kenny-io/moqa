@@ -15,7 +15,7 @@ export function Header({ showAuthButtons = true, showUserMenu = false }: HeaderP
         <div className="flex items-center space-x-2">
           <WebhookIcon className="h-6 w-6 text-primary" />
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-            <Link href="/" className="hover:text-primary transition-colors">WebhookTester</Link>
+            <Link href="/" className="hover:text-primary transition-colors">Moqa</Link>
           </span>
         </div>
         <nav className="flex items-center space-x-4">

@@ -7,8 +7,11 @@ import { Toaster } from '@/components/ui/sonner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Webhook Mock - Test and Debug Webhooks',
+  title: 'Moqa - Test and Debug Webhooks',
   description: 'A powerful webhook testing and debugging service',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
@@ -32,3 +35,4 @@ export default function RootLayout({
     </html>
   );
 }
+

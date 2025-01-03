@@ -47,6 +47,24 @@ export default function SignUpPage() {
     }
   };
 
+  // const handleGitHubSignUp = async () => {
+  //   try {
+  //     const { error } = await supabase.auth.signInWithOAuth({
+  //       provider: 'github',
+  //       options: {
+  //         redirectTo: `${window.location.origin}/auth/callback`,
+  //       },
+  //     });
+
+  //     if (error) {
+  //       toast.error(error.message);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error signing up with GitHub:', error);
+  //     toast.error('Failed to sign up with GitHub');
+  //   }
+  // };
+
   const handleGitHubSignUp = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -60,11 +78,11 @@ export default function SignUpPage() {
         toast.error(error.message);
       }
     } catch (error) {
-      console.error('Error signing up with GitHub:', error);
-      toast.error('Failed to sign up with GitHub');
+      console.error("Error signing up with GitHub:", error);
+      toast.error("An unexpected error occurred");
     }
   };
-
+  
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header showAuthButtons={false} />

@@ -2,15 +2,15 @@ import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/auth/sign-in", "/auth/sign-up"];
+const PUBLIC_PATHS = ["/", "/auth/sign-in", "/auth/sign-up", "/auth/callback"];
 const WEBHOOK_PATH = /^\/api\/webhook\/.+/;
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
-  // Allow webhook endpoints to be accessed without authentication
-  if (WEBHOOK_PATH.test(req.nextUrl.pathname)) {
+  // Allow webhook endpoints and callback to be accessed without authentication
+  if (WEBHOOK_PATH.test(req.nextUrl.pathname) || req.nextUrl.pathname === '/auth/callback') {
     return res;
   }
 

@@ -9,8 +9,18 @@ export async function GET(request: Request) {
   if (code) {
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    
+    // Exchange the code for a session
     await supabase.auth.exchangeCodeForSession(code);
+
+    // Get the current session to verify authentication worked
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      return NextResponse.redirect(new URL('/auth/sign-in', request.url));
+    }
   }
 
-  return NextResponse.redirect(new URL("/dashboard", request.url));
+  // Redirect to dashboard after successful authentication
+  return NextResponse.redirect(new URL('/dashboard', request.url));
 }

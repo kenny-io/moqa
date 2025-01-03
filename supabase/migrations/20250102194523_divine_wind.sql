@@ -89,3 +89,27 @@ alter publication supabase_realtime add table webhook_requests;
 
 -- Enable replication for INSERT events
 alter table webhook_requests replica identity full;
+
+
+-- -- Allow public access to insert webhook requests (realtime requests show up in the table)
+-- CREATE POLICY "Allow public webhook request creation"
+--   ON webhook_requests
+--   FOR INSERT
+--   TO public
+--   WITH CHECK (true);
+
+-- -- Make sure the webhook_requests table is added to the realtime publication
+-- alter publication supabase_realtime add table webhook_requests;
+
+-- -- Enable replication for INSERT events
+-- alter table webhook_requests replica identity full;
+
+-- -- Enable RLS on the table
+-- ALTER TABLE webhook_endpoints ENABLE ROW LEVEL SECURITY;
+
+-- -- Create a policy that allows anyone to read webhook endpoints
+-- CREATE POLICY webhook_endpoints_read_policy 
+-- ON webhook_endpoints 
+-- FOR SELECT 
+-- TO PUBLIC 
+-- USING (true);
