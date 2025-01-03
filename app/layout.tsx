@@ -1,10 +1,15 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Exo_2 } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 
+
 const inter = Inter({ subsets: ['latin'] });
+const exo2 = Exo_2({ 
+  subsets: ['latin'],
+  variable: '--font-exo2',
+});
 
 export const metadata: Metadata = {
   title: 'Moqa - Test and Debug Webhooks',
@@ -21,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${exo2.variable}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -12,6 +12,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { getSiteURL } from '@/lib/utils';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ export default function SignUpPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${getSiteURL()}/auth/callback`,
         },
       });
 
@@ -47,30 +48,13 @@ export default function SignUpPage() {
     }
   };
 
-  // const handleGitHubSignUp = async () => {
-  //   try {
-  //     const { error } = await supabase.auth.signInWithOAuth({
-  //       provider: 'github',
-  //       options: {
-  //         redirectTo: `${window.location.origin}/auth/callback`,
-  //       },
-  //     });
-
-  //     if (error) {
-  //       toast.error(error.message);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error signing up with GitHub:', error);
-  //     toast.error('Failed to sign up with GitHub');
-  //   }
-  // };
 
   const handleGitHubSignUp = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${getSiteURL()}/auth/callback`,
         },
       });
 
@@ -82,7 +66,7 @@ export default function SignUpPage() {
       toast.error("An unexpected error occurred");
     }
   };
-  
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header showAuthButtons={false} />

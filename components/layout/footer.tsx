@@ -13,9 +13,9 @@ export function Footer() {
             </p>
           </div>
           <div className="flex gap-6 text-sm text-white/70">
-            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-primary transition-colors">Terms</Link>
-            <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
+            <Link href="https://github.com/moqa-io/moqa" className="hover:text-primary transition-colors">Github</Link>
+            <Link href="https://kenny.engineer" className="hover:text-primary transition-colors">Website</Link>
+            <Link href="https://twitter.com/kenny_io" className="hover:text-primary transition-colors">Twitter</Link>
           </div>
         </div>
       </div>

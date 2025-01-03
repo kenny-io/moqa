@@ -21,3 +21,12 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+@layer base {
+  html {
+    font-family: var(--font-exo2);
+  }
+  h1, h2 {
+    @apply font-heading;
+  }
+}

@@ -46,7 +46,7 @@ export default function Home() {
                     <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
                       <WebhookIcon className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold text-white">Real-time Inspection</h3>
+                    <h2 className="text-xl font-bold text-white font-arimo">Real-time Inspection</h2>
                     <p className="text-white/70 leading-relaxed">
                       Watch incoming webhook requests in real-time with detailed information about headers, body, and more.
                     </p>
@@ -61,7 +61,7 @@ export default function Home() {
                     <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
                       <WebhookIcon className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold text-white">Custom Responses</h3>
+                    <h3 className="text-xl font-bold text-white font-arimo">Custom Responses</h3>
                     <p className="text-white/70 leading-relaxed">
                       Configure custom response status codes, headers, and body content for your webhook endpoints.
                     </p>
@@ -76,7 +76,7 @@ export default function Home() {
                     <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
                       <WebhookIcon className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold text-white">Request History</h3>
+                    <h3 className="text-xl font-bold text-white font-arimo">Request History</h3>
                     <p className="text-white/70 leading-relaxed">
                       Keep track of all incoming requests with searchable and filterable history.
                     </p>
