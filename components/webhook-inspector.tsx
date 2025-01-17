@@ -7,6 +7,7 @@ import { ResponseConfig } from '@/components/response-config';
 import { RequestList } from '@/components/request-list';
 import { RequestDetails } from '@/components/request-details';
 import { supabase } from '@/lib/supabase';
+import { DatePicker } from '@/components/ui/date-picker';
 
 interface WebhookInspectorProps {
   endpoint: WebhookEndpoint;
@@ -15,14 +16,20 @@ interface WebhookInspectorProps {
 export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
   const [currentEndpoint, setCurrentEndpoint] = useState(endpoint);
   const [requests, setRequests] = useState<WebhookRequest[]>([]);
+  const [filteredRequests, setFilteredRequests] = useState<WebhookRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<WebhookRequest | null>(null);
+  const [filterDate, setFilterDate] = useState<Date | null>(null);
+  const [filterType, setFilterType] = useState<string | null>(null);
 
-  // Update local state when the endpoint prop changes
   useEffect(() => {
     setCurrentEndpoint(endpoint);
     setSelectedRequest(null);
     loadRequests();
-  }, [endpoint.id]); // Only reload when endpoint ID changes
+  }, [endpoint.id]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [requests, filterDate, filterType]);
 
   const loadRequests = async () => {
     const { data, error } = await supabase
@@ -37,8 +44,29 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
     }
 
     setRequests(data);
+    setFilteredRequests(data);
     if (data.length > 0) {
       setSelectedRequest(data[0]);
+    }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...requests];
+
+    if (filterDate) {
+      filtered = filtered.filter((request) => {
+        const requestDate = new Date(request.timestamp).toDateString();
+        return requestDate === filterDate.toDateString();
+      });
+    }
+
+    if (filterType) {
+      filtered = filtered.filter((request) => request.method === filterType);
+    }
+
+    setFilteredRequests(filtered);
+    if (!filtered.includes(selectedRequest!)) {
+      setSelectedRequest(filtered[0] || null);
     }
   };
 
@@ -71,7 +99,7 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
     return () => {
       channel.unsubscribe();
     };
-  }, [endpoint.id]); // Re-subscribe when endpoint changes
+  }, [endpoint.id]);
 
   const handleConfigUpdate = (updatedEndpoint: WebhookEndpoint) => {
     setCurrentEndpoint(updatedEndpoint);
@@ -85,9 +113,27 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
           <TabsTrigger value="settings">Response Settings</TabsTrigger>
         </TabsList>
         <TabsContent value="requests" className="flex-1">
+          <div className="p-4 flex items-center space-x-4">
+            <DatePicker
+              selected={filterDate}
+              onChange={(date: any) => setFilterDate(date)}
+              placeholderText="Filter by date"
+            />
+            <select
+              className="border rounded px-2 py-1"
+              value={filterType || ''}
+              onChange={(e) => setFilterType(e.target.value || null)}
+            >
+              <option value="">All Methods</option>
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
           <div className="grid grid-cols-2 gap-4 h-full">
             <RequestList
-              requests={requests}
+              requests={filteredRequests}
               selectedRequest={selectedRequest}
               onSelect={setSelectedRequest}
             />
