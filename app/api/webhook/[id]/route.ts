@@ -60,8 +60,13 @@ async function handleWebhook(request: NextRequest, id: string) {
   const clone = request.clone();
   
   if (contentType?.includes('application/json')) {
-    const jsonBody = await clone.json();
-    bodyText = JSON.stringify(jsonBody);
+    try {
+      const jsonBody = await clone.json();
+      bodyText = JSON.stringify(jsonBody);
+    } catch (error) {
+      console.error('Error parsing JSON body:', error);
+      return new NextResponse('Invalid JSON body', { status: 400 });
+    }
   } else {
     bodyText = await clone.text();
   }
