@@ -2,19 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
+import { PlusIcon, MenuIcon } from 'lucide-react';
 import { WebhookEndpoint } from '@/lib/types';
 import { CreateWebhookDialog } from '@/components/create-webhook-dialog';
 import { WebhookList } from '@/components/webhook-list';
 import { WebhookInspector } from '@/components/webhook-inspector';
-import { UserMenu } from '@/components/user-menu';
-import { supabase } from '@/lib/supabase';
 import { Header } from '@/components/layout/header';
+import { supabase } from '@/lib/supabase';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 export default function DashboardPage() {
   const [endpoints, setEndpoints] = useState<WebhookEndpoint[]>([]);
   const [selectedEndpoint, setSelectedEndpoint] = useState<WebhookEndpoint | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     loadEndpoints();
@@ -37,6 +39,7 @@ export default function DashboardPage() {
   const handleEndpointCreated = (newEndpoint: WebhookEndpoint) => {
     setEndpoints([newEndpoint, ...endpoints]);
     setSelectedEndpoint(newEndpoint);
+    setIsSidebarOpen(false);
   };
 
   const handleEndpointDeleted = (deletedEndpoint: WebhookEndpoint) => {
@@ -46,40 +49,96 @@ export default function DashboardPage() {
     }
   };
 
+  const Sidebar = () => (
+    <div className="h-full flex flex-col">
+      <div className="p-4 border-b border-border/40">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-foreground">
+            Webhooks
+          </h2>
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)} 
+            size="sm"
+            className="bg-primary hover:bg-primary/90"
+          >
+            <PlusIcon className="h-4 w-4 mr-1.5" />
+            New
+          </Button>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {endpoints.length} webhook{endpoints.length !== 1 ? 's' : ''} configured
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <WebhookList
+          endpoints={endpoints}
+          selectedEndpoint={selectedEndpoint}
+          onSelect={(endpoint) => {
+            setSelectedEndpoint(endpoint);
+            setIsSidebarOpen(false);
+          }}
+          onDelete={handleEndpointDeleted}
+        />
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
+    <div className="flex flex-col h-screen bg-background/95">
       <Header showAuthButtons={false} showUserMenu={true} />
       
-      <div className="flex flex-1">
-        <div className="w-1/3 border-r border-white/10 bg-background/95">
-          <div className="p-4 border-b border-white/10 flex items-center justify-between backdrop-blur-sm">
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-              Your Webhooks
-            </h2>
-            <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-primary hover:bg-primary/90 text-white">
-              <PlusIcon className="h-4 w-4 mr-2" />
-              New Webhook
-            </Button>
-          </div>
-          <div className="p-4">
-            <WebhookList
-              endpoints={endpoints}
-              selectedEndpoint={selectedEndpoint}
-              onSelect={setSelectedEndpoint}
-              onDelete={handleEndpointDeleted}
-            />
-          </div>
+      <div className="flex-1 flex min-h-0">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block w-80 border-r border-border/40 bg-background">
+          <Sidebar />
         </div>
-        <div className="flex-1 p-4 bg-background/30 backdrop-blur-sm">
+
+        {/* Mobile Sidebar */}
+        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+          <SheetTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="fixed md:hidden top-20 left-6 z-40 h-9 w-9 p-0 bg-background/95 backdrop-blur-sm border border-border/40"
+            >
+              <MenuIcon className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-80 p-0">
+            <Sidebar />
+          </SheetContent>
+        </Sheet>
+
+        {/* Main Content */}
+        <div className="flex-1 min-w-0 overflow-hidden bg-background/50 backdrop-blur-sm">
           {selectedEndpoint ? (
-            <WebhookInspector endpoint={selectedEndpoint} />
+            <div className="h-full">
+              <WebhookInspector endpoint={selectedEndpoint} />
+            </div>
           ) : (
-            <div className="flex h-full items-center justify-center text-white/50">
-              Select a webhook to view its details
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center max-w-md mx-auto px-4">
+                <h3 className="text-xl font-semibold mb-3">
+                  Welcome to Your Webhook Dashboard
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  Select a webhook from the sidebar to view its details and monitor incoming requests, 
+                  or create a new webhook to get started.
+                </p>
+                <Button 
+                  onClick={() => setIsCreateDialogOpen(true)}
+                  className="bg-primary hover:bg-primary/90"
+                  size="lg"
+                >
+                  <PlusIcon className="h-5 w-5 mr-2" />
+                  Create Your First Webhook
+                </Button>
+              </div>
             </div>
           )}
         </div>
       </div>
+
       <CreateWebhookDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}

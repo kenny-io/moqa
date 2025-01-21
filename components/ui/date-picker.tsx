@@ -1,29 +1,49 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { Popover, PopoverTrigger, PopoverContent } from '@radix-ui/react-popover';
-import { DayPicker } from 'react-day-picker';
-import 'react-day-picker/dist/style.css';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+"use client";
 
-export function DatePicker({ selected, onChange, placeholderText }: { selected: Date | null, onChange: (date: Date | null) => void, placeholderText: string }) {
-  const [isOpen, setIsOpen] = useState(false);
+import * as React from "react";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
+interface DatePickerProps {
+  selected: Date | undefined;
+  onChange: (date: Date | undefined) => void;
+  placeholder?: string;
+}
+
+export function DatePicker({ selected, onChange, placeholder = "Pick a date" }: DatePickerProps) {
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-    <PopoverTrigger asChild>
-        <button className="border rounded px-2 py-1 flex items-center space-x-2">
-          <CalendarIcon />
-          <span>{selected ? selected.toDateString() : placeholderText}</span>
-        </button>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            "w-[240px] justify-start text-left font-normal",
+            !selected && "text-muted-foreground"
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {selected ? format(selected, "PPP") : placeholder}
+        </Button>
       </PopoverTrigger>
-      <PopoverContent className='bg-white text-black'>
-        <DayPicker
-          selected={selected!}
-          onDayClick={(day) => {
-            onChange(day);
-            setIsOpen(false);
-          }}
+      <PopoverContent 
+        className="w-auto p-0 bg-background border shadow-md" 
+        align="start"
+        sideOffset={8}
+      >
+        <Calendar
+          mode="single"
+          selected={selected}
+          onSelect={onChange}
+          initialFocus
+          className="rounded-md bg-background"
         />
       </PopoverContent>
     </Popover>
