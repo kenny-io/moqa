@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,18 +13,48 @@ import { toast } from "sonner";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { getBaseUrl } from '@/lib/utils';
+
+
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Signing in...");
+  const [loadingStartTime, setLoadingStartTime] = useState<number | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isLoading && loadingStartTime) {
+      interval = setInterval(() => {
+        const elapsedTime = Date.now() - loadingStartTime;
+        
+        if (elapsedTime <= 5000) {
+          setLoadingMessage("Signing in...");
+        } else if (elapsedTime <= 15000) {
+          setLoadingMessage("Preparing your account");
+        } else if (elapsedTime <= 25000) {
+          setLoadingMessage("These things take time...");
+        } else {
+          setLoadingMessage("Wait a little longer");
+        }
+      }, 100);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isLoading, loadingStartTime]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -34,8 +64,11 @@ export default function SignInPage() {
         return;
       }
 
-      toast.success("Signed in successfully");
-      router.push("/dashboard");
+      if (data.session) {
+        // Immediately redirect once we have a session
+        router.push("/dashboard");
+        toast.success("Signed in successfully");
+      }
     } catch (error) {
       console.error("Error signing in:", error);
       toast.error("An unexpected error occurred");
@@ -44,15 +77,33 @@ export default function SignInPage() {
     }
   };
 
+  // const handleGitHubSignIn = async () => {
+  //   try {
+  //     const { error } = await supabase.auth.signInWithOAuth({
+  //       provider: 'github',
+  //       options: {
+  //         redirectTo: `${getBaseUrl()}/auth/callback`,
+  //       },
+  //     });
+
+  //     if (error) {
+  //       toast.error(error.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error signing in with GitHub:", error);
+  //     toast.error("An unexpected error occurred");
+  //   }
+  // };
+  
   const handleGitHubSignIn = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${getBaseUrl()}/auth/callback`,
-        },
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
       });
-
+  
       if (error) {
         toast.error(error.message);
       }
@@ -61,6 +112,7 @@ export default function SignInPage() {
       toast.error("An unexpected error occurred");
     }
   };
+  
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header showAuthButtons={false} />
@@ -150,7 +202,7 @@ export default function SignInPage() {
                       {isLoading ? (
                         <div className="flex items-center space-x-2">
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          <span>Signing in...</span>
+                          <span>{loadingMessage}</span>
                         </div>
                       ) : (
                         "Sign In"

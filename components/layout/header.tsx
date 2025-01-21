@@ -23,7 +23,7 @@ export function Header({ showAuthButtons = true, showUserMenu = false }: HeaderP
           {showAuthButtons && (
             <>
               <Button variant="ghost" asChild className="hidden sm:inline-flex hover:bg-white/10 text-white/90">
-                <Link href="/auth/login">Login</Link>
+                <Link href="/auth/sign-in">Login</Link>
               </Button>
               <Button asChild className="bg-primary hover:bg-primary/90 text-white">
                 <Link href="/auth/sign-up">Sign Up</Link>

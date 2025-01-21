@@ -2,25 +2,22 @@ import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Array of public paths that don't require authentication
-const publicPaths = [
-  '/',
-  '/auth/sign-in',
-  '/auth/sign-up',
-  '/auth/callback',
-  '/docs', // Add docs to public paths
-];
+const PUBLIC_PATHS = ["/", "/auth/sign-in", "/auth/sign-up", "/auth/callback"];
+const WEBHOOK_PATH = /^\/api\/webhook\/.+/;
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
-  // Check if the path is public
-  const isPublicPath = publicPaths.some(path => 
-    req.nextUrl.pathname === path || req.nextUrl.pathname.startsWith('/docs/')
-  );
+  // Handle the callback code
+  const callbackCode = req.nextUrl.searchParams.get('code');
+  if (callbackCode && req.nextUrl.pathname === '/') {
+    // Redirect to the callback route with the code
+    return NextResponse.redirect(new URL(`/auth/callback?code=${callbackCode}`, req.url));
+  }
 
-  if (isPublicPath) {
+  // Allow webhook endpoints and callback to be accessed without authentication
+  if (WEBHOOK_PATH.test(req.nextUrl.pathname) || req.nextUrl.pathname === '/auth/callback') {
     return res;
   }
 
@@ -28,23 +25,21 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // If no session and trying to access protected route, redirect to login
+  const isPublicPath = PUBLIC_PATHS.includes(req.nextUrl.pathname);
+
+  // Redirect authenticated users away from auth pages
+  if (session && isPublicPath) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  // Redirect unauthenticated users to sign-in page
   if (!session && !isPublicPath) {
-    return NextResponse.redirect(new URL('/auth/sign-in', req.url));
+    return NextResponse.redirect(new URL("/auth/sign-in", req.url));
   }
 
   return res;
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { getBaseUrl } from '@/lib/utils';
+// import { getAuthConfig } from "@/lib/auth-config";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -53,11 +54,9 @@ export default function SignUpPage() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
-        options: {
-          redirectTo: `${getBaseUrl()}/auth/callback`,
-        },
+        // options: getAuthConfig(),
       });
-
+  
       if (error) {
         toast.error(error.message);
       }
