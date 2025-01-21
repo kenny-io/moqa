@@ -107,9 +107,9 @@ alter table webhook_requests replica identity full;
 -- -- Enable RLS on the table
 -- ALTER TABLE webhook_endpoints ENABLE ROW LEVEL SECURITY;
 
--- -- Create a policy that allows anyone to read webhook endpoints
--- CREATE POLICY webhook_endpoints_read_policy 
--- ON webhook_endpoints 
--- FOR SELECT 
--- TO PUBLIC 
--- USING (true);
+-- Create a policy that allows anyone to read webhook endpoints
+CREATE POLICY webhook_endpoints_read_policy 
+ON webhook_endpoints 
+FOR SELECT 
+TO PUBLIC 
+USING (true);

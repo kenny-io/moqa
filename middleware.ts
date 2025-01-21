@@ -9,11 +9,17 @@ const publicPaths = [
   '/auth/sign-up',
   '/auth/callback',
   '/docs', // Add docs to public paths
+  '/api/webhook/:id'
 ];
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
+
+  const { pathname } = req.nextUrl;
+  if (pathname.startsWith('/api/webhook/')) {
+    return NextResponse.next();
+  }
 
   // Check if the path is public
   const isPublicPath = publicPaths.some(path => 
