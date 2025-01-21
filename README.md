@@ -2,7 +2,7 @@
 
 A powerful webhook creation, testing and debugging service built with Next.js and Supabase.
 
-![Webhook Mock Screenshot](https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&q=80&w=1200&h=600)
+![Moqa banner](https://github.com/user-attachments/assets/70fbfb97-6b4a-48e3-b21b-9f346ae6ac8c)
 
 ## Features
 
