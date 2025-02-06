@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import { TokenStorage } from '@/lib/token-storage';
+import { getTempUserId } from '@/lib/temp-user';
 
 interface CreateWebhookDialogProps {
   open: boolean;
@@ -33,32 +34,39 @@ export function CreateWebhookDialog({
 
     try {
       // Get the current user's session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        toast.error('Please sign in to create webhooks');
-        return;
-      }
+      const { data: { session } } = await supabase.auth.getSession();
+      const tempUserId = getTempUserId();
+
+       // I am setting the temp_user_id in the PostgreSQL session if not authenticated
+    if (!session?.user) {
+      await supabase.rpc('set_temp_user_id', { 
+        p_temp_user_id: tempUserId 
+      });
+    }
 
       const webhookId = uuidv4();
       const authToken = isPrivate ? generateToken() : null;
 
+      const webhookData = {
+        id: webhookId,
+        name,
+        url: `/api/webhook/${webhookId}`,
+        response_config: {
+          status_code: 200,
+          content_type: 'application/json',
+          body: '{"message": "OK"}',
+          delay: 0
+        },
+        is_private: isPrivate,
+        auth_token: authToken,
+        // If user is authenticated, use their ID; otherwise use temp ID
+        user_id: session?.user?.id || null,
+        temp_user_id: session?.user?.id ? null : tempUserId
+      };
+
       const { data, error } = await supabase
         .from('webhook_endpoints')
-        .insert({
-          id: webhookId,
-          name,
-          url: `/api/webhook/${webhookId}`,
-          response_config: {
-            status_code: 200,
-            content_type: 'application/json',
-            body: '{"message": "OK"}',
-            delay: 0
-          },
-          is_private: isPrivate,
-          auth_token: authToken,
-          user_id: session.user.id
-        })
+        .insert(webhookData)
         .select()
         .single();
 
@@ -82,6 +90,17 @@ export function CreateWebhookDialog({
         );
       } else {
         toast.success('Webhook created successfully!');
+      }
+
+      if (!session?.user) {
+        toast.message(
+          <div className="space-y-2">
+            <p className="font-medium">Webhook Created as Temporary User</p>
+            <p className="text-sm text-muted-foreground">
+              Sign in to keep your webhooks permanently. Temporary webhooks expire after 3 days.
+            </p>
+          </div>
+        );
       }
 
       onCreated(data);

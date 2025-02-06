@@ -34,6 +34,12 @@ async function handleWebhook(request: NextRequest, id: string) {
   const cookieStore = cookies();
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
+  console.log('Handling webhook request:', {
+    id,
+    method: request.method,
+    url: request.url
+  });
+
   // Get the webhook endpoint configuration
   const { data: endpoint, error: endpointError } = await supabase
     .from('webhook_endpoints')
@@ -41,15 +47,35 @@ async function handleWebhook(request: NextRequest, id: string) {
     .eq('id', id)
     .single();
 
-  if (endpointError || !endpoint) {
-    console.error('Webhook not found:', id, endpointError);
+  if (endpointError) {
+    console.error('Error fetching webhook:', {
+      id,
+      error: endpointError,
+      status: endpointError.code,
+      message: endpointError.message
+    });
     return new NextResponse('Webhook not found', { status: 404 });
   }
+
+  if (!endpoint) {
+    console.error('Webhook not found:', id);
+    return new NextResponse('Webhook not found', { status: 404 });
+  }
+
+  console.log('Found webhook:', {
+    id: endpoint.id,
+    name: endpoint.name,
+    isPrivate: endpoint.is_private
+  });
 
   // Check authentication for private endpoints
   if (endpoint.is_private) {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || authHeader !== `Bearer ${endpoint.auth_token}`) {
+      console.error('Unauthorized access attempt:', {
+        id,
+        hasAuthHeader: !!authHeader
+      });
       return new NextResponse('Unauthorized', { status: 401 });
     }
   }
@@ -87,7 +113,17 @@ async function handleWebhook(request: NextRequest, id: string) {
     .insert(requestData);
 
   if (requestError) {
-    console.error('Error storing webhook request:', requestError);
+    console.error('Error storing webhook request:', {
+      id,
+      error: requestError,
+      requestData
+    });
+  } else {
+    console.log('Stored webhook request:', {
+      id,
+      method: requestData.method,
+      timestamp: requestData.timestamp
+    });
   }
 
   // Apply response delay if configured

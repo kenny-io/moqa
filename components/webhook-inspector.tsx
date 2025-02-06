@@ -16,9 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { convertRequestsToCSV, downloadCSV } from '@/lib/export-util';
 
 interface WebhookInspectorProps {
   endpoint: WebhookEndpoint;
@@ -31,6 +32,8 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
   const [selectedRequest, setSelectedRequest] = useState<WebhookRequest | null>(null);
   const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
   const [filterType, setFilterType] = useState<string | null>(null);
+  const [lastChecked, setLastChecked] = useState<string | null>(null);
+
 
   useEffect(() => {
     setCurrentEndpoint(endpoint);
@@ -43,23 +46,34 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
   }, [requests, filterDate, filterType]);
 
   const loadRequests = async () => {
-    const { data, error } = await supabase
-      .from('webhook_requests')
-      .select('*')
-      .eq('endpoint_id', endpoint.id)
-      .order('timestamp', { ascending: false });
+    try {
+      // Set temp_user_id if this is a temporary webhook
+      if (endpoint.temp_user_id) {
+        await supabase.rpc('set_temp_user_id', { 
+          p_temp_user_id: endpoint.temp_user_id 
+        });
+      }
 
-    if (error) {
-      console.error('Error loading requests:', error);
-      return;
-    }
+      const { data, error } = await supabase
+        .from('webhook_requests')
+        .select('*')
+        .eq('endpoint_id', endpoint.id)
+        .order('timestamp', { ascending: false });
 
-    setRequests(data);
-    setFilteredRequests(data);
-    if (data.length > 0) {
-      setSelectedRequest(data[0]);
+      if (error) {
+        console.error('Error loading requests:', error);
+        return;
+      }
+
+      setRequests(data || []);
+      setFilteredRequests(data || []);
+      if (data && data.length > 0) {
+        setSelectedRequest(data[0]);
+      }
+    } catch (error) {
+      console.error('Error in loadRequests:', error);
     }
-  };
+};
 
   const applyFilters = () => {
     let filtered = [...requests];
@@ -122,6 +136,33 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
   };
 
   const hasActiveFilters = filterDate || filterType;
+
+
+  const ExportButton = () => {
+    const handleExport = () => {
+      // Export filtered requests if filters are active, otherwise export all requests
+      const requestsToExport = hasActiveFilters ? filteredRequests : requests;
+      const filterSuffix = hasActiveFilters ? '-filtered' : '';
+      
+      const csvContent = convertRequestsToCSV(requestsToExport);
+      const filename = `webhook-requests-${endpoint.name}${filterSuffix}-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      
+      downloadCSV(csvContent, filename);
+    };
+  
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleExport}
+        className="ml-auto"
+        disabled={requests.length === 0}
+      >
+        <Download className="h-4 w-4 mr-2" />
+        Export {hasActiveFilters ? 'Filtered ' : ''}CSV
+      </Button>
+    );
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -197,6 +238,8 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
                       </Button>
                     )}
                   </div>
+
+                  <ExportButton />
 
                   {hasActiveFilters && (
                     <div className="flex flex-wrap items-center gap-2">

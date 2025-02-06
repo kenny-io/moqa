@@ -11,36 +11,107 @@ import { Header } from '@/components/layout/header';
 import { supabase } from '@/lib/supabase';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { getTempUserId } from '@/lib/temp-user';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function DashboardPage() {
   const [endpoints, setEndpoints] = useState<WebhookEndpoint[]>([]);
   const [selectedEndpoint, setSelectedEndpoint] = useState<WebhookEndpoint | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
-    loadEndpoints();
+    // Get initial session
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+  
+    initializeAuth();
+  
+    // Set up auth state change subscription
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+  
+    return () => subscription.unsubscribe();
   }, []);
+  
+  useEffect(() => {
+    if (user !== undefined) { // Only load endpoints after auth state is determined
+      loadEndpoints();
+    }
+  }, [user]); // Depend on user state instead of running once
 
   const loadEndpoints = async () => {
+    const tempUserId = getTempUserId();
+    
+    try {
+      console.log(user)
+      if (!user && tempUserId) {
+        await supabase.rpc('set_temp_user_id', { 
+          p_temp_user_id: tempUserId 
+        });
+      }
+
+      let query = supabase
+        .from('webhook_endpoints')
+        .select('*');
+        
+      if (user) {
+        // If user is authenticated, get their webhooks
+        query = query.eq('user_id', user.id);
+      } else if (tempUserId) {
+        // If not authenticated, get webhooks for temp user
+        query = query.eq('temp_user_id', tempUserId);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading endpoints:', error);
+        return;
+      }
+
+      console.log('Loaded endpoints:', {
+        userId: user?.id,
+        tempUserId,
+        endpoints: data
+      });
+      
+      setEndpoints(data || []);
+    } catch (error) {
+      console.error('Error in loadEndpoints:', error);
+    }
+  };
+
+  const handleEndpointCreated = async (newEndpoint: Partial<WebhookEndpoint>) => {
+    const endpointData = {
+      ...newEndpoint,
+      user_id: user?.id || null,
+      temp_user_id: user?.id ? null : getTempUserId(),
+    };
+
     const { data, error } = await supabase
       .from('webhook_endpoints')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .insert(endpointData)
+      .select()
+      .single();
 
     if (error) {
-      console.error('Error loading endpoints:', error);
+      console.error('Error creating endpoint:', error);
       return;
     }
 
-    setEndpoints(data);
-  };
-
-  const handleEndpointCreated = (newEndpoint: WebhookEndpoint) => {
-    setEndpoints([newEndpoint, ...endpoints]);
-    setSelectedEndpoint(newEndpoint);
+    setEndpoints([data, ...endpoints]);
+    setSelectedEndpoint(data);
     setIsSidebarOpen(false);
   };
+
+
 
   const handleEndpointDeleted = (deletedEndpoint: WebhookEndpoint) => {
     setEndpoints(endpoints.filter(e => e.id !== deletedEndpoint.id));

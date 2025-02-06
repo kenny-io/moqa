@@ -7,6 +7,7 @@ export interface WebhookEndpoint {
   is_private: boolean;
   auth_token?: string;
   user_id: string;
+  temp_user_id?: string;
 }
 
 export interface ResponseConfig {
