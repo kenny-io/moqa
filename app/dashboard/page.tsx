@@ -39,6 +39,58 @@ export default function DashboardPage() {
   
     return () => subscription.unsubscribe();
   }, []);
+
+  const subscribeToEndpoints = () => {
+    const channel = supabase
+      .channel(`webhook_endpoints_${user?.id || getTempUserId()}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'webhook_endpoints',
+          filter: user?.id 
+            ? `user_id=eq.${user.id}`
+            : `temp_user_id=eq.${getTempUserId()}`
+        },
+        (payload) => {
+          switch (payload.eventType) {
+            case 'INSERT':
+              setEndpoints(prev => [payload.new as WebhookEndpoint, ...prev]);
+              break;
+            case 'UPDATE':
+              setEndpoints(prev => 
+                prev.map(endpoint => 
+                  endpoint.id === payload.new.id 
+                    ? { ...endpoint, ...payload.new } 
+                    : endpoint
+                )
+              );
+              break;
+            case 'DELETE':
+              setEndpoints(prev => 
+                prev.filter(endpoint => endpoint.id !== payload.old.id)
+              );
+              if (selectedEndpoint?.id === payload.old.id) {
+                setSelectedEndpoint(null);
+              }
+              break;
+          }
+        }
+      )
+      .subscribe();
+  
+    return channel;
+  };
+
+  useEffect(() => {
+    if (user !== undefined) { // Only subscribe after auth state is determined
+      const channel = subscribeToEndpoints();
+      return () => {
+        channel.unsubscribe();
+      };
+    }
+  }, [user]); // Depend on user state
   
   useEffect(() => {
     if (user !== undefined) { // Only load endpoints after auth state is determined
@@ -106,7 +158,7 @@ export default function DashboardPage() {
       return;
     }
 
-    setEndpoints([data, ...endpoints]);
+    // setEndpoints([data, ...endpoints]);
     setSelectedEndpoint(data);
     setIsSidebarOpen(false);
   };
