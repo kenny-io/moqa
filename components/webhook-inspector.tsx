@@ -26,14 +26,13 @@ interface WebhookInspectorProps {
 }
 
 export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
-  const [currentEndpoint, setCurrentEndpoint] = useState(endpoint);
+  const [currentEndpoint, setCurrentEndpoint] = useState<WebhookEndpoint>(endpoint);
   const [requests, setRequests] = useState<WebhookRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<WebhookRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<WebhookRequest | null>(null);
   const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
   const [filterType, setFilterType] = useState<string | null>(null);
-  const [lastChecked, setLastChecked] = useState<string | null>(null);
-
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   useEffect(() => {
     setCurrentEndpoint(endpoint);
@@ -46,6 +45,7 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
   }, [requests, filterDate, filterType]);
 
   const loadRequests = async () => {
+    setIsRefreshing(true);
     try {
       // Set temp_user_id if this is a temporary webhook
       if (endpoint.temp_user_id) {
@@ -72,8 +72,10 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
       }
     } catch (error) {
       console.error('Error in loadRequests:', error);
+    } finally {
+      setIsRefreshing(false);
     }
-};
+  };
 
   const applyFilters = () => {
     let filtered = [...requests];
@@ -137,10 +139,38 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
 
   const hasActiveFilters = filterDate || filterType;
 
+  const RefreshButton = () => {
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={loadRequests}
+        className="ml-2"
+        disabled={isRefreshing}
+      >
+        <svg
+          className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+          <path d="M21 3v5h-5" />
+          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+          <path d="M3 21v-5h5" />
+        </svg>
+      </Button>
+    );
+  };
 
   const ExportButton = () => {
     const handleExport = () => {
-      // Export filtered requests if filters are active, otherwise export all requests
       const requestsToExport = hasActiveFilters ? filteredRequests : requests;
       const filterSuffix = hasActiveFilters ? '-filtered' : '';
       
@@ -239,7 +269,10 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
                     )}
                   </div>
 
-                  <ExportButton />
+                  <div className="flex items-center">
+                    <ExportButton />
+                    <RefreshButton />
+                  </div>
 
                   {hasActiveFilters && (
                     <div className="flex flex-wrap items-center gap-2">
