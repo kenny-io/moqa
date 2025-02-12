@@ -103,6 +103,8 @@ export function CreateWebhookDialog({
         );
       }
 
+      window.location.reload();
+
       onCreated(data);
       onOpenChange(false);
       setName('');
