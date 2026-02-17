@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   title: 'Moqa - Test and Debug Webhooks',
   description: 'A powerful webhook testing and debugging service',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/icon.png',
   },
 };
 
