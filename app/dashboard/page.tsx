@@ -21,9 +21,16 @@ export default function DashboardPage() {
   }, []);
 
   const loadEndpoints = async () => {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      setEndpoints([]);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('webhook_endpoints')
       .select('*')
+      .eq('user_id', session.user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -47,38 +54,50 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
+    <div className="flex flex-col h-screen bg-[#f7f7f9] text-foreground">
       <Header showAuthButtons={false} showUserMenu={true} />
       
-      <div className="flex flex-1">
-        <div className="w-1/3 border-r border-white/10 bg-background/95">
-          <div className="p-4 border-b border-white/10 flex items-center justify-between backdrop-blur-sm">
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-              Your Webhooks
-            </h2>
-            <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-primary hover:bg-primary/90 text-white">
-              <PlusIcon className="h-4 w-4 mr-2" />
-              New Webhook
-            </Button>
-          </div>
-          <div className="p-4">
-            <WebhookList
-              endpoints={endpoints}
-              selectedEndpoint={selectedEndpoint}
-              onSelect={setSelectedEndpoint}
-              onDelete={handleEndpointDeleted}
-            />
-          </div>
-        </div>
-        <div className="flex-1 p-4 bg-background/30 backdrop-blur-sm">
-          {selectedEndpoint ? (
-            <WebhookInspector endpoint={selectedEndpoint} />
-          ) : (
-            <div className="flex h-full items-center justify-center text-white/50">
-              Select a webhook to view its details
+      <div className="flex flex-1 gap-6 p-6">
+        <section className="w-[320px] shrink-0">
+          <div className="rounded-2xl border border-black/5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden">
+            <div className="p-5 border-b border-black/5 flex items-center justify-between">
+              <div>
+                <h2 className="text-sm font-semibold text-foreground">Your Webhooks</h2>
+                <p className="text-xs text-muted-foreground">Manage endpoints and inspect traffic</p>
+              </div>
+              <Button onClick={() => setIsCreateDialogOpen(true)} size="sm" className="bg-black text-white hover:bg-black/90 shadow-sm">
+                <PlusIcon className="h-4 w-4 mr-2" />
+                New
+              </Button>
             </div>
-          )}
-        </div>
+            <div className="p-4">
+              <WebhookList
+                endpoints={endpoints}
+                selectedEndpoint={selectedEndpoint}
+                onSelect={setSelectedEndpoint}
+                onDelete={handleEndpointDeleted}
+              />
+            </div>
+          </div>
+        </section>
+        <section className="flex-1">
+          <div className="h-full rounded-2xl border border-black/5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] p-6">
+            {selectedEndpoint ? (
+              <WebhookInspector endpoint={selectedEndpoint} />
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <div className="text-center max-w-sm">
+                  <div className="mx-auto mb-3 h-12 w-12 rounded-2xl border border-black/5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex items-center justify-center">
+                    <PlusIcon className="h-5 w-5 text-foreground/80" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Select a webhook to view its details
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
       <CreateWebhookDialog
         open={isCreateDialogOpen}

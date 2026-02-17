@@ -114,41 +114,36 @@ export default function SignInPage() {
   };
   
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-[#f7f7f9]">
       <Header showAuthButtons={false} />
       
       <main className="flex-1 flex items-center justify-center py-16 px-4">
-        <div className="absolute inset-0 bg-hero-glow opacity-50"></div>
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -inset-[10px] opacity-50">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] animate-pulse"></div>
-            <div className="absolute top-1/4 left-1/3 w-[300px] h-[300px] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-300"></div>
-            <div className="absolute bottom-1/3 right-1/4 w-[250px] h-[250px] bg-purple-500/20 rounded-full blur-[100px] animate-pulse delay-700"></div>
-          </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-[#f7f7f9]"></div>
+        <div className="absolute inset-0">
+          <div className="pointer-events-none absolute left-1/2 top-24 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-black/5 blur-[120px]"></div>
         </div>
 
         <div className="relative z-10 w-full max-w-[420px]">
-          <Card className="border border-white/10 bg-black/40 backdrop-blur-xl">
-            <CardHeader className="space-y-1 pb-8">
-              <div className="w-full flex justify-center mb-4">
-                <div className="p-4 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
-                  <KeyRound className="w-6 h-6 text-primary" />
+          <Card className="border border-black/5 bg-white shadow-[0_12px_40px_-24px_rgba(0,0,0,0.2)]">
+            <CardHeader className="space-y-2 pb-6">
+              <div className="w-full flex justify-center">
+                <div className="h-12 w-12 rounded-2xl border border-black/10 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex items-center justify-center">
+                  <KeyRound className="h-5 w-5 text-foreground" />
                 </div>
               </div>
-              <CardTitle className="text-2xl text-center bg-clip-text text-transparent bg-gradient-to-r from-white via-primary/90 to-primary">
+              <CardTitle className="text-2xl text-center tracking-tight text-foreground">
                 Welcome Back
               </CardTitle>
-              <p className="text-sm text-center text-white/50">
+              <p className="text-sm text-center text-muted-foreground">
                 Sign in to continue to your dashboard
               </p>
             </CardHeader>
             <CardContent className="relative">
-              <div className="absolute -inset-[1px] rounded-[inherit] bg-gradient-to-r from-primary/20 via-white/10 to-primary/20 blur-[1px]"></div>
-              <div className="relative bg-black/50 rounded-[inherit] p-6 backdrop-blur-xl">
+              <div className="relative rounded-[inherit] p-6">
                 <div className="flex flex-col space-y-4">
                   <Button 
                     variant="outline" 
-                    className="w-full border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-sm"
+                    className="w-full border-black/10 bg-white hover:bg-[#f5f5f7]"
                     onClick={handleGitHubSignIn}
                   >
                     <GithubIcon className="mr-2 h-4 w-4" />
@@ -157,18 +152,18 @@ export default function SignInPage() {
 
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-white/10"></span>
+                      <span className="w-full border-t border-black/10"></span>
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-white/50 backdrop-blur-sm">or continue with email</span>
+                      <span className="bg-white px-2 text-muted-foreground">or continue with email</span>
                     </div>
                   </div>
 
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-white/70">Email</Label>
+                      <Label htmlFor="email" className="text-foreground">Email</Label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-2.5 h-4 w-4 text-white/30" />
+                        <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="email"
                           type="email"
@@ -176,32 +171,32 @@ export default function SignInPage() {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           required
-                          className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50 focus:ring-primary/50"
+                          className="pl-10 bg-background border-input text-foreground focus:border-primary/50 focus:ring-primary/50"
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="password" className="text-white/70">Password</Label>
+                      <Label htmlFor="password" className="text-foreground">Password</Label>
                       <div className="relative">
-                        <KeyRound className="absolute left-3 top-2.5 h-4 w-4 text-white/30" />
+                        <KeyRound className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="password"
                           type="password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
-                          className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50 focus:ring-primary/50"
+                          className="pl-10 bg-background border-input text-foreground focus:border-primary/50 focus:ring-primary/50"
                         />
                       </div>
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full bg-primary hover:bg-primary/90 text-white"
+                      className="w-full bg-black hover:bg-black/90 text-white"
                       disabled={isLoading}
                     >
                       {isLoading ? (
                         <div className="flex items-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin"></div>
                           <span>{loadingMessage}</span>
                         </div>
                       ) : (
@@ -214,7 +209,7 @@ export default function SignInPage() {
             </CardContent>
           </Card>
           
-          <div className="mt-6 text-center text-sm text-white/50 backdrop-blur-sm">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link 
               href="/auth/sign-up" 

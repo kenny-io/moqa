@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { supabaseServer } from '@/lib/supabase-server';
 
 export async function GET(
   request: NextRequest,
@@ -31,8 +30,7 @@ export async function DELETE(
 }
 
 async function handleWebhook(request: NextRequest, id: string) {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = supabaseServer;
 
   // Get the webhook endpoint configuration
   const { data: endpoint, error: endpointError } = await supabase

@@ -19,10 +19,12 @@ export function RequestDetails({ request }: RequestDetailsProps) {
   };
 
   return (
-    <div className="border rounded-md overflow-hidden">
-      <div className="bg-muted p-2 font-medium">Request Details</div>
-      <Tabs defaultValue="headers" className="p-2">
-        <TabsList>
+    <div className="rounded-xl border border-black/5 overflow-hidden bg-white">
+      <div className="px-4 py-3 border-b border-black/5 text-sm font-semibold text-foreground">
+        Request Details
+      </div>
+      <Tabs defaultValue="headers" className="p-3">
+        <TabsList className="mb-2 bg-[#f5f5f7] p-1 rounded-lg border border-black/5">
           <TabsTrigger value="headers">Headers</TabsTrigger>
           <TabsTrigger value="body">Body</TabsTrigger>
           <TabsTrigger value="query">Query</TabsTrigger>
@@ -40,7 +42,7 @@ export function RequestDetails({ request }: RequestDetailsProps) {
                 fontSize: 14,
                 tabSize: 2,
               }}
-              theme="vs-dark"
+              theme="vs-light"
             />
           </TabsContent>
           <TabsContent value="body">
@@ -55,7 +57,7 @@ export function RequestDetails({ request }: RequestDetailsProps) {
                 fontSize: 14,
                 tabSize: 2,
               }}
-              theme="vs-dark"
+              theme="vs-light"
             />
           </TabsContent>
           <TabsContent value="query">
@@ -70,7 +72,7 @@ export function RequestDetails({ request }: RequestDetailsProps) {
                 fontSize: 14,
                 tabSize: 2,
               }}
-              theme="vs-dark"
+              theme="vs-light"
             />
           </TabsContent>
         </ScrollArea>

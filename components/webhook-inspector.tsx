@@ -79,8 +79,16 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
 
   return (
     <div className="h-full flex flex-col">
+      <div className="flex items-start justify-between border-b border-black/5 pb-4 mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">{currentEndpoint.name}</h3>
+          <p className="text-xs text-muted-foreground font-mono">
+            /api/webhook/{currentEndpoint.id}
+          </p>
+        </div>
+      </div>
       <Tabs defaultValue="requests" className="flex-1">
-        <TabsList>
+        <TabsList className="mb-4 bg-[#f5f5f7] p-1 rounded-xl border border-black/5">
           <TabsTrigger value="requests">Requests</TabsTrigger>
           <TabsTrigger value="settings">Response Settings</TabsTrigger>
         </TabsList>
@@ -94,7 +102,7 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
             {selectedRequest ? (
               <RequestDetails request={selectedRequest} />
             ) : (
-              <div className="flex items-center justify-center text-muted-foreground">
+              <div className="flex items-center justify-center text-muted-foreground border border-dashed border-black/10 rounded-xl bg-[#fafafa]">
                 Select a request to view its details
               </div>
             )}

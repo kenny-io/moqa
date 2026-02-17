@@ -29,10 +29,17 @@ export function DeleteWebhookDialog({
 }: DeleteWebhookDialogProps) {
   const handleDelete = async () => {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        toast.error('Please sign in to delete webhooks');
+        return;
+      }
+
       const { error } = await supabase
         .from('webhook_endpoints')
         .delete()
-        .eq('id', webhook.id);
+        .eq('id', webhook.id)
+        .eq('user_id', session.user.id);
 
       if (error) {
         toast.error('Failed to delete webhook');

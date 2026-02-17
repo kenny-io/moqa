@@ -29,8 +29,9 @@ export default function RootLayout({
       <body className={`${inter.className} ${exo2.variable}`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
+          forcedTheme="light"
           disableTransitionOnChange
         >
           {children}
@@ -40,4 +41,3 @@ export default function RootLayout({
     </html>
   );
 }
-

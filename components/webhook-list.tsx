@@ -35,38 +35,38 @@ export function WebhookList({
       {endpoints.map((endpoint) => (
         <div
           key={endpoint.id}
-          className={`p-4 rounded-lg cursor-pointer group relative ${
+          className={`p-3 rounded-xl border transition-all cursor-pointer group relative ${
             selectedEndpoint?.id === endpoint.id
-              ? 'bg-primary/10 hover:bg-primary/15'
-              : 'hover:bg-white/5'
+              ? 'border-black/10 bg-[#f5f5f7] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.02)]'
+              : 'border-transparent bg-transparent hover:bg-[#f5f5f7]'
           }`}
           onClick={() => onSelect(endpoint)}
         >
-          <h3 className="font-medium mb-1">{endpoint.name}</h3>
-          <p className="text-sm text-white/60 break-all">
+          <h3 className="text-sm font-semibold text-foreground mb-1">{endpoint.name}</h3>
+          <p className="text-xs text-muted-foreground break-all font-mono">
             {`${getBaseUrl()}/api/webhook/${endpoint.id}`}
           </p>
           
-          <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+          <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleCopy(endpoint);
               }}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              className="p-2 hover:bg-white rounded-full transition-colors"
               title="Copy webhook URL"
             >
-              <Copy className="h-4 w-4 text-white/70" />
+              <Copy className="h-4 w-4 text-muted-foreground" />
             </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setDeleteWebhook(endpoint);
               }}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              className="p-2 hover:bg-white rounded-full transition-colors"
               title="Delete webhook"
             >
-              <Trash2Icon className="h-4 w-4 text-white/70" />
+              <Trash2Icon className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
         </div>
@@ -82,7 +82,7 @@ export function WebhookList({
       )}
 
       {endpoints.length === 0 && (
-        <div className="text-center py-8 text-white/50">
+        <div className="text-center py-10 text-muted-foreground border border-dashed border-black/10 rounded-xl bg-[#fafafa]">
           No webhooks created yet
         </div>
       )}

@@ -31,10 +31,17 @@ export function ResponseConfig({ endpoint, onConfigUpdate }: ResponseConfigProps
 
   const handleSave = async () => {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        toast.error('Please sign in to update configuration');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('webhook_endpoints')
         .update({ response_config: config })
         .eq('id', endpoint.id)
+        .eq('user_id', session.user.id)
         .select()
         .single();
 
@@ -65,38 +72,44 @@ export function ResponseConfig({ endpoint, onConfigUpdate }: ResponseConfigProps
   };
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>Status Code</Label>
-        <Input
-          type="number"
-          min={100}
-          max={599}
-          value={config.status_code}
-          onChange={(e) =>
-            setConfig({ ...config, status_code: parseInt(e.target.value) || 200 })
-          }
-        />
+    <div className="rounded-xl border border-black/5 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <div className="mb-4">
+        <h3 className="text-sm font-semibold text-foreground">Response Configuration</h3>
+        <p className="text-xs text-muted-foreground">Define how your webhook should respond.</p>
       </div>
-      <div className="space-y-2">
-        <Label>Content Type</Label>
-        <Select
-          value={config.content_type}
-          onValueChange={(value: any) =>
-            setConfig({ ...config, content_type: value })
-          }
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="application/json">JSON</SelectItem>
-            <SelectItem value="text/plain">Plain Text</SelectItem>
-            <SelectItem value="application/xml">XML</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label>Status Code</Label>
+          <Input
+            type="number"
+            min={100}
+            max={599}
+            value={config.status_code}
+            onChange={(e) =>
+              setConfig({ ...config, status_code: parseInt(e.target.value) || 200 })
+            }
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Content Type</Label>
+          <Select
+            value={config.content_type}
+            onValueChange={(value: any) =>
+              setConfig({ ...config, content_type: value })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="application/json">JSON</SelectItem>
+              <SelectItem value="text/plain">Plain Text</SelectItem>
+              <SelectItem value="application/xml">XML</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-      <div className="space-y-2">
+      <div className="mt-4 space-y-2">
         <Label>Response Body</Label>
         <Textarea
           value={config.body}
@@ -112,24 +125,28 @@ export function ResponseConfig({ endpoint, onConfigUpdate }: ResponseConfigProps
           className="font-mono"
         />
       </div>
-      <div className="space-y-2">
-        <Label>Response Delay (seconds)</Label>
-        <Input
-          type="number"
-          min={0}
-          max={60}
-          value={config.delay}
-          onChange={(e) =>
-            setConfig({ ...config, delay: parseInt(e.target.value) || 0 })
-          }
-        />
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 items-end">
+        <div className="space-y-2">
+          <Label>Response Delay (seconds)</Label>
+          <Input
+            type="number"
+            min={0}
+            max={60}
+            value={config.delay}
+            onChange={(e) =>
+              setConfig({ ...config, delay: parseInt(e.target.value) || 0 })
+            }
+          />
+        </div>
+        <div className="sm:justify-self-end">
+          <Button 
+            onClick={handleSave} 
+            className="w-full sm:w-auto bg-black text-white hover:bg-black/90"
+          >
+            Save Configuration
+          </Button>
+        </div>
       </div>
-      <Button 
-        onClick={handleSave} 
-        className="w-full"
-      >
-        Save Configuration
-      </Button>
     </div>
   );
 }

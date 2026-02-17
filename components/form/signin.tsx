@@ -92,7 +92,7 @@ function SignInForm() {
     <div className="flex flex-col space-y-4">
       <Button 
         variant="outline" 
-        className="w-full border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-sm"
+        className="w-full border-border/60 bg-background hover:bg-muted backdrop-blur-sm"
         onClick={handleGitHubSignIn}
       >
         <GithubIcon className="mr-2 h-4 w-4" />
@@ -101,18 +101,18 @@ function SignInForm() {
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-white/10"></span>
+          <span className="w-full border-t border-border/60"></span>
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-white/50 backdrop-blur-sm">or continue with email</span>
+          <span className="bg-background px-2 text-muted-foreground backdrop-blur-sm">or continue with email</span>
         </div>
       </div>
 
       <form onSubmit={handleSignIn} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-white/70">Email</Label>
+          <Label htmlFor="email" className="text-foreground">Email</Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-white/30" />
+            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               id="email"
               type="email"
@@ -120,32 +120,32 @@ function SignInForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50 focus:ring-primary/50"
+              className="pl-10 bg-background border-input text-foreground focus:border-primary/50 focus:ring-primary/50"
             />
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-white/70">Password</Label>
+          <Label htmlFor="password" className="text-foreground">Password</Label>
           <div className="relative">
-            <KeyRound className="absolute left-3 top-2.5 h-4 w-4 text-white/30" />
+            <KeyRound className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50 focus:ring-primary/50"
+              className="pl-10 bg-background border-input text-foreground focus:border-primary/50 focus:ring-primary/50"
             />
           </div>
         </div>
         <Button 
           type="submit" 
-          className="w-full bg-primary hover:bg-primary/90 text-white"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
           disabled={isLoading}
         >
           {isLoading ? (
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-primary rounded-full animate-spin"></div>
               <span>{loadingMessage}</span>
             </div>
           ) : (

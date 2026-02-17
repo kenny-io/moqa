@@ -16,8 +16,10 @@ export function RequestList({
   onSelect,
 }: RequestListProps) {
   return (
-    <div className="border rounded-md overflow-hidden">
-      <div className="bg-muted p-2 font-medium">Recent Requests</div>
+    <div className="rounded-xl border border-black/5 overflow-hidden bg-white">
+      <div className="px-4 py-3 border-b border-black/5 text-sm font-semibold text-foreground">
+        Recent Requests
+      </div>
       <div className="divide-y">
         {requests.map((request) => (
           
@@ -25,29 +27,29 @@ export function RequestList({
           <div
             key={request.id}
             className={cn(
-              "p-2 cursor-pointer transition-colors",
+              "px-4 py-3 cursor-pointer transition-colors",
               selectedRequest?.id === request.id 
-                ? "bg-primary/10 hover:bg-primary/20 border-l-2 border-l-primary" 
-                : "hover:bg-accent"
+                ? "bg-[#f5f5f7] border-l-2 border-l-foreground/80" 
+                : "hover:bg-[#f5f5f7]"
             )}
             onClick={() => onSelect(request)}
           >
             <div className="flex items-center justify-between">
               <span className={cn(
-                "font-medium",
-                selectedRequest?.id === request.id && "text-primary"
+                "text-sm font-semibold",
+                selectedRequest?.id === request.id && "text-foreground"
               )}>{request.method}</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {format(new Date(request.timestamp), 'HH:mm:ss')}
               </span>
             </div>
-            <div className="text-sm text-muted-foreground truncate">
+            <div className="text-xs text-muted-foreground truncate">
               {request.source_ip}
             </div>
           </div>
         ))}
         {requests.length === 0 && (
-          <div className="p-4 text-center text-muted-foreground">
+          <div className="p-6 text-center text-muted-foreground">
             No requests yet
           </div>
         )}

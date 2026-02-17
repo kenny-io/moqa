@@ -3,18 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-}
-
-body {
-  background-color: #030711;
-  color: #ffffff;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 24 95% 53%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 24 95% 53%;
+  --radius: 0.75rem;
+  --chart-1: 262 83% 58%;
+  --chart-2: 200 98% 39%;
+  --chart-3: 142 70% 45%;
+  --chart-4: 38 92% 50%;
+  --chart-5: 0 84% 60%;
 }
 
 ::selection {
-  background: rgba(124, 58, 237, 0.2);
-  color: #ffffff;
+  background: rgba(255, 149, 0, 0.18);
+  color: hsl(var(--foreground));
 }
 
 /* Optional: Add smooth scrolling */
@@ -28,5 +46,11 @@ html {
   }
   h1, h2 {
     @apply font-heading;
+  }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
