@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { WebhookIcon, Trash2Icon, Copy } from 'lucide-react';
 import { DeleteWebhookDialog } from '@/components/delete-webhook-dialog';
-import { getBaseUrl } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface WebhookListProps {
@@ -25,7 +24,7 @@ export function WebhookList({
   const [deleteWebhook, setDeleteWebhook] = useState<WebhookEndpoint | null>(null);
 
   const handleCopy = (webhook: WebhookEndpoint) => {
-    const fullUrl = `${getBaseUrl()}/api/webhook/${webhook.id}`;
+    const fullUrl = `${window.location.origin}/api/webhook/${webhook.id}`;
     navigator.clipboard.writeText(fullUrl);
     toast.success('Webhook URL copied to clipboard');
   };
@@ -44,7 +43,7 @@ export function WebhookList({
         >
           <h3 className="text-sm font-semibold text-foreground mb-1">{endpoint.name}</h3>
           <p className="text-xs text-muted-foreground break-all font-mono">
-            {`${getBaseUrl()}/api/webhook/${endpoint.id}`}
+            {`${window.location.origin}/api/webhook/${endpoint.id}`}
           </p>
           
           <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">

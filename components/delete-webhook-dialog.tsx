@@ -58,16 +58,21 @@ export function DeleteWebhookDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete Webhook</AlertDialogTitle>
-          <AlertDialogDescription>
+      <AlertDialogContent className="border border-black/5 bg-white shadow-[0_16px_40px_-24px_rgba(0,0,0,0.35)] rounded-2xl">
+        <AlertDialogHeader className="space-y-3">
+          <AlertDialogTitle className="text-xl font-semibold tracking-tight">Delete Webhook</AlertDialogTitle>
+          <AlertDialogDescription className="text-base text-muted-foreground">
             Are you sure you want to delete the webhook "{webhook.name}"? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+        <AlertDialogFooter className="gap-3 sm:gap-2">
+          <AlertDialogCancel className="border border-black/10 bg-white text-foreground hover:bg-[#f5f5f7]">
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            className="bg-[#ff3b30] text-white hover:bg-[#e6362c]"
+          >
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

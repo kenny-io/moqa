@@ -83,7 +83,7 @@ export function WebhookInspector({ endpoint }: WebhookInspectorProps) {
         <div>
           <h3 className="text-lg font-semibold text-foreground">{currentEndpoint.name}</h3>
           <p className="text-xs text-muted-foreground font-mono">
-            /api/webhook/{currentEndpoint.id}
+            {typeof window !== 'undefined' ? window.location.origin : ''}/api/webhook/{currentEndpoint.id}
           </p>
         </div>
       </div>
