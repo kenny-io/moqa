@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { getBaseUrl } from '@/lib/utils';
+import { getAuthConfig } from '@/lib/auth-config';
 
 
 export default function SignInPage() {
@@ -77,31 +78,11 @@ export default function SignInPage() {
     }
   };
 
-  // const handleGitHubSignIn = async () => {
-  //   try {
-  //     const { error } = await supabase.auth.signInWithOAuth({
-  //       provider: 'github',
-  //       options: {
-  //         redirectTo: `${getBaseUrl()}/auth/callback`,
-  //       },
-  //     });
-
-  //     if (error) {
-  //       toast.error(error.message);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error signing in with GitHub:", error);
-  //     toast.error("An unexpected error occurred");
-  //   }
-  // };
-  
   const handleGitHubSignIn = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
+        options: getAuthConfig(),
       });
   
       if (error) {
