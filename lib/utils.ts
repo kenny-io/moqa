@@ -13,7 +13,7 @@ export function getBaseUrl() {
   
   // SSR should use Netlify URL
   if (process.env.NETLIFY === 'true') {
-    return process.env.URL || 'https://moqaio.netlify.app';
+    return process.env.URL || 'https://usemoqa.xyz';
   }
 
   // dev SSR should use localhost

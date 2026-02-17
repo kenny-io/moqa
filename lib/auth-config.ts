@@ -1,7 +1,7 @@
 export const getAuthConfig = () => {
   const origin = typeof window !== 'undefined'
     ? window.location.origin
-    : 'https://moqaio.netlify.app';
+    : 'https://usemoqa.xyz';
 
   return {
     redirectTo: `${origin}/auth/callback`,
