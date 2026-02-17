@@ -22,7 +22,8 @@ export function UserMenu() {
         toast.error('Error signing out');
         return;
       }
-      router.push('/auth/sign-in');
+      router.refresh();
+      window.location.href = '/auth/sign-in';
     } catch (error) {
       console.error('Error signing out:', error);
       toast.error('An unexpected error occurred');
